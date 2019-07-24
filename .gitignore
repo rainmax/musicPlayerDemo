@@ -1,1 +1,4 @@
 /node_modules/
+/source/*.jpg
+/source/*.mp3
+/source/*.txt
