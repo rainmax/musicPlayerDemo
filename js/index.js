@@ -1,15 +1,26 @@
 $(function () {
-
   //初始化播放器
   var player = new Player($('audio'));
+  player.setVolume(0.5);
 
-  //初始化滚动条
-  var $barBottom = $('.time-progress .bar-bottom');
-  var $barTop = $('.time-progress .bar-top');
-  var $barDot = $('.time-progress .bar-dot');
+  var $lyShowArea = $('.music-lyric-inner');
+  var lyric = new Lyric($lyShowArea);
+
+  //初始化时间进度条
+  var $timeBarBottom = $('.time-progress .bar-bottom');
+  var $timeBarTop = $('.time-progress .bar-top');
+  var $timeBarDot = $('.time-progress .bar-dot');
   var $time = $('.time-progress .time');
 
-  var progress = new Progress($barBottom, $barTop, $barDot, $time);
+  var timeProgress = new Progress($timeBarBottom, $timeBarTop, $timeBarDot, $time);
+
+  //初始化音量进度条
+  var $volumeButton = $('.volume .volume-button');
+  var $volumeBarBottom = $('.volume .bar-bottom');
+  var $volumeBarTop = $('.volume .bar-top');
+  var $volumeBarDot = $('.volume .bar-dot');
+
+  var volume = new Volume($volumeButton, $volumeBarBottom, $volumeBarTop, $volumeBarDot);
 
   //设置dom元素的事件监听
   handleInit();
@@ -91,6 +102,9 @@ $(function () {
         //4.取出其他行的播放gif图
         $prevListIitem.find('.num').removeClass('select');
         $curListItem.find('.num').addClass('select');
+
+        //5.加载新歌的歌词
+        lyric.loadLyric($curListItem.get(0).music.link_lrc);
       }
       prevMusicIndex = curMusicIndex;
       //固定显示当前歌曲的播放等按钮
@@ -183,22 +197,111 @@ $(function () {
     })
 
     $('.ft-next').click(function () {
+      var $prevListItem = $('.music-list .list-item').eq(curMusicIndex);
 
+      if ($prevListItem.find('.menu-list-js-play').hasClass('menu-list-play')) {
+        //给播放列表中正在播放的歌曲添加样式
+        $prevListItem.toggleClass('list-item-light');
+        $prevListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
+        $prevListItem.find('.num').toggleClass('select');
+        $('.ft-pause').addClass('ft-play');
+      }
+
+      //播放音乐
+      player.playNext();
+
+      //更新当前音乐的位置下标
+      curMusicIndex = player.prevIndex;
+      prevMusicIndex = curMusicIndex;
+      var $curListItem = $('.music-list .list-item').eq(curMusicIndex);
+
+      $curListItem.toggleClass('list-item-light');
+      $curListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
+      $curListItem.find('.num').toggleClass('select');
+
+      setMusicInfo($curListItem.get(0).music);
     })
 
-    //播放事件钩子，用于动态改变当前时间
+
+    //该变量为进度条滑动标记，当进度条被用户滑动时，值为true
+    var progressMoving = false;
+    var jumpTo = false;
+    var ySum = 0;
+    var lyIndex = 0;
+    //播放事件钩子，用于音乐播放时不停的改变时间
     player.audioTimeUpdate(function (currentTime, duration, timeStr) {
-      $('.time-progress .time').text(timeStr);
-      progress.setprogressWidth(currentTime / duration * 100);
+      //用户在滑动进度条时，这里就不该动进度条的长度了
+      if (!progressMoving) {
+        $time.text(timeStr);
+        timeProgress.setprogressWidth(currentTime / duration * 100);
+      }
+      //用户点击了进度条跳转，此时应该将索引设到对应歌词上
+      if (jumpTo) {
+        lyric.setCurIndex(currentTime);
+        lyIndex = lyric.getCurIndex();
+        ySum = 0;
+        $lyShowArea.find('p').each(function (index, domElem) {
+          if (index > lyIndex - 3) return false;
+          ySum += $(domElem).innerHeight();
+        })
+        jumpTo = false;
+      }
+
+      //同步歌词
+      if (parseInt(currentTime) >= lyric.getCurLyricTime()) {
+        lyIndex = lyric.getCurIndex();
+        $lyShowArea.find('p').eq(lyIndex).addClass('on').siblings('[class=on]').removeClass('on');
+        lyric.goNext();
+        if (lyIndex < 2) return;
+        var yLength = $lyShowArea.find('p').eq(lyIndex - 2).innerHeight();
+        ySum += yLength;
+        $lyShowArea.css('transform', `translate(0px, -${ySum}px)`);
+      }
     })
 
-    /**
-     * 进度条点击钩子，用于点击后改变当前歌曲时间
-     * @param {double} radio 进度条当前宽度与总宽度的比值
-     */
-    progress.progressClick(function (radio) {
+
+    //进度条点击钩子，用于点击后改变当前歌曲时间
+    timeProgress.progressClick(function (radio) {
+      jumpTo = true;
       player.setCurTime(radio);
     })
+
+
+    //进度条移动钩子，用于点击后改变当前歌曲时间
+    timeProgress.progressMoveEvent(function (radio) {
+      progressMoving = true;
+      //改变当前显示的歌曲进度
+      var duration = player.getDuration();
+      var currentTime = duration * radio;
+      var timeStr = timeFormat(currentTime, duration);
+      $time.text(timeStr);
+    }, function (radio) {
+      progressMoving = false;
+      jumpTo = true;
+      player.setCurTime(radio);
+    })
+
+    //音量按钮点击钩子，点击切换静音
+    volume.ButtonClick(function (radio) {
+      $volumeButton.toggleClass('muted');
+
+      $volumeButton.hasClass('muted') ? player.setVolume(0) : player.setVolume(radio);
+    })
+
+    //音量进度条点击钩子，实现点击改变音量
+    volume.ProgressClick(function (radio) {
+      player.setVolume(radio);
+    })
+
+    //音量进度条移动钩子，用户滑动进度条时会多次触发回调
+    volume.progressMove(function (radio) {
+      player.setVolume(radio);
+    })
+
+    //播放结束钩子，播放结束后自动切换下一首歌
+    player.audioEndEvent(function () {
+      $('.ft-next').trigger('click');
+    });
   }
 
   function getMusicList() {
@@ -214,8 +317,10 @@ $(function () {
           musicList.append(musicItem);
         });
         setMusicInfo(data[0]);
-        player.play(0);
-        player.play(0);
+        player.loadMusic(data[0].link_url);
+        player.prevIndex = 0;
+        //载入歌词
+        lyric.loadLyric(data[0].link_lrc);
       },
       error: function () {
         console.log('网络请求出错');

@@ -66,6 +66,7 @@ a {
   float: left;
   width: 800px;
   height: 450px;
+  user-select: none;
 }
 
 .main .inner-right {
@@ -73,6 +74,7 @@ a {
   width: 400px;
   height: 450px;
   color: rgba(255, 255, 255, .5);
+  user-select: none;
 }
 
 .inner-left .list-tool-bar {
@@ -365,14 +367,29 @@ a {
   width: 180px;
 }
 
-.inner-right .music-lryic {
-  margin-top: 50px;
+.inner-right .music-lyric {
+  margin-top: 30px;
   text-align: center;
 }
 
-.inner-right .music-lryic li{
-  margin-top: 5px;
+.inner-right .music-lyric .music-lyric-box {
+  height: 100px;
+  overflow: hidden;
 }
+
+.music-lyric .music-lyric-box .music-lyric-inner{
+  transition: all 0.5s ease;
+}
+
+.inner-right .music-lyric p {
+  line-height: 32px;
+}
+
+.music-lyric p.on {
+  color: #31c27c;
+}
+
+
 
 
 
@@ -537,7 +554,7 @@ a {
   display: inline-block;
 }
 
-.footer-in .volume a{
+.footer-in .volume .volume-button{
   display: inline-block;
   margin-right: 5px;
   width: 26px;
@@ -545,26 +562,34 @@ a {
   background: url("../images/player.png") no-repeat 0 -144px;
 }
 
+.volume .volume-button.muted {
+  background: url("../images/player.png") no-repeat 0 -182px;
+}
+
 .volume .bar-bottom {
   display: inline-block;
-  width: 70px;
-  height: 4px;
+  padding: 4px 0;
+  width: 80px;
+  height: 2px;
+  cursor: pointer;
   background: rgba(255, 255, 255, 0.5);
+  background-clip: content-box;
 }
 
 .volume .bar-top {
   position: relative;
-  width: 100%;
-  height: 4px;
+  width: 40px;
+  height: 2px;
   background: rgba(255, 255, 255);
 }
 
 .volume .bar-top .bar-dot {
   position: absolute;
   margin-top: -4px;
+  margin-right: -5px;
   right: 0;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #fff; 
 }

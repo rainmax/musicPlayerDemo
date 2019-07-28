@@ -42,14 +42,20 @@
           <a href="javascript:;" class="cover">
             <img alt="cover">
           </a>
-          <p>歌曲名:<a href="" class="music-name">流着泪说分手</a></p>
-          <p>歌手名: <a href="" class="singer">金志文</a></p>
-          <p>专辑名: <a href="" class="ablum">流着泪说分手</a></p>
+          <p>歌曲名:<a href="" class="music-name"></a></p>
+          <p>歌手名: <a href="" class="singer"></a></p>
+          <p>专辑名: <a href="" class="ablum"></a></p>
         </div>
-        <ul class="music-lryic">
-          <li>当你转身离开以后</li>
-          <li>我站在原地没有走</li>
-        </ul>
+
+        <div class="music-lyric">
+          <div class="music-lyric-box">
+            <!-- 用music-lyric-inner来做滚动 -->
+            <div class="music-lyric-inner">
+              <p>你纵欲对方水电费文</p>
+            </div>
+          </div>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -75,7 +81,7 @@
       <a href="javascript:;" class="comment"></a>
       <a href="javascript:;" class="only-off"></a>
       <div class="volume">
-        <a href="javascript:;"></a>
+        <a href="javascript:;" class="volume-button"></a>
         <div class="bar-bottom">
           <div class="bar-top">
             <div class="bar-dot"></div>
@@ -91,7 +97,9 @@
   <script src="./js/jquery.mCustomScrollbar.concat.min.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/player.js"></script>
-  <script src="./js/progress.js"></script>
+  <script src="./js/timeProgress.js"></script>
+  <script src="./js/volume.js"></script>
+  <script src="./js/lyric.js"></script>
   <script src="./js/index.js"></script>
 </body>
 </html>

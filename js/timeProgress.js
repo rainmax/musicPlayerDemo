@@ -13,16 +13,20 @@
       this.$barTop = $barTop;
       this.$barDot = $barDot;
       this.$time = $time;
-      this.progressDragInit();
     },
 
+    /**
+     * 进度条点击钩子
+     * @param {function} callback 
+     * @param {double} radio 进度条当前宽度与总宽度的比值
+     */
     progressClick: function (callback) {
       var that = this;
 
       //进度条点击事件，点击改变进度条宽度
       this.$barBottom.click(function (event) {
         //获取整个进度条完整的宽度
-        var fullWidth = that.$barBottom.get(0).clientWidth;
+        var fullWidth = $(this).innerWidth();
 
         //获取鼠标点击位置距离进度条开始位置的宽度
         var w = event.pageX - $(this).offset().left;
@@ -30,42 +34,40 @@
         that.$barTop.css('width', `${w}px`);
         
         var radio = w / fullWidth;
-        // var ratio = 
+        
         callback(radio);
-
       })
     },
 
-    progressDragInit: function () {
+    /**
+     * 进度条移动钩子
+     * @param {function} moveFn 回调函数，进度条被用户滑动时会被连续调用
+     * @param {function} moveUpFn 回调函数，用户点击或滑动进度条后松开鼠标时被调用
+     * @param {double} radio 进度条当前宽度与总宽度的比值
+     */
+    progressMoveEvent: function (moveFn, moveUpFn) {
       var that = this;
       var minLength = 0;
       var maxLength = this.$barBottom.get(0).clientWidth;
+      var radio = 0; //比例
       this.$barDot.mousedown(function () {
         $(document).mousemove(function (event) {
           var w = event.pageX - that.$barBottom.offset().left;
           if (minLength <= w && w <= maxLength) {
             that.$barTop.css('width', `${w}px`);
-            //改变时间
-            var tempArr1 = that.$time.text().split('/');
-            var tempArr2 = tempArr1[1].split(':');
-
-            var songFullSecond = parseInt(tempArr2[0]) * 60 + parseInt(tempArr2[1]);
-            var rate = w / that.$barBottom.get(0).clientWidth;
-            var curFullSecond = parseInt(songFullSecond * rate);
-            var curMin = parseInt(curFullSecond / 60);
-            var curSecond = curFullSecond % 60;
-
-            curMin = curMin.toString().padStart(2, '0');
-            curSecond = curSecond.toString().padStart(2, '0');
-            that.$time.text(`${curMin}:${curSecond} / ${tempArr1[1]}`);
+            radio = w / maxLength;
+            moveFn(radio);
           }
         })
 
         $(document).mouseup(function () {
-          $(document).off('mousemove');
+          //解绑事件，以免造成叠加绑定
+          $(document).off('mousemove').off('mouseup');
+          moveUpFn(radio);
         })
       })
     },
+
 
     //设置进度条宽度
     setprogressWidth: function (value) {
