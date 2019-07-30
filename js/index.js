@@ -168,7 +168,8 @@ $(function () {
     })
 
     $('.ft-prev').click(function () {
-      if (player.prevIndex === -1) return;
+      // 加载新歌的歌词
+      lyric.loadLyric($curListItem.get(0).music.link_lrc);
 
       var $prevListItem = $('.music-list .list-item').eq(curMusicIndex);
 
@@ -194,9 +195,15 @@ $(function () {
       $curListItem.find('.num').toggleClass('select');
 
       setMusicInfo($curListItem.get(0).music);
+
+    
     })
 
     $('.ft-next').click(function () {
+
+      //加载新歌的歌词
+      lyric.loadLyric($curListItem.get(0).music.link_lrc);
+
       var $prevListItem = $('.music-list .list-item').eq(curMusicIndex);
 
       if ($prevListItem.find('.menu-list-js-play').hasClass('menu-list-play')) {
@@ -220,6 +227,7 @@ $(function () {
       $curListItem.find('.num').toggleClass('select');
 
       setMusicInfo($curListItem.get(0).music);
+
     })
 
 
