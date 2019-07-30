@@ -306,7 +306,7 @@ $(function () {
 
   function getMusicList() {
     $.ajax({
-      url: '../source/musiclist.json',
+      url: '/source/musiclist.json',
       dataType: 'JSON',
       success: function (data) {
         player.musicList = data;
