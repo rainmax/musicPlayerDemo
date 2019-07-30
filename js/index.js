@@ -305,6 +305,9 @@ $(function () {
   }
 
   function getMusicList() {
+    $.ajaxSetup({
+      url: '/musicPlayerDemo',
+    });
     $.ajax({
       url: '/source/musiclist.json',
       dataType: 'JSON',
