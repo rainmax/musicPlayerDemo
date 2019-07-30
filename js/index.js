@@ -230,6 +230,9 @@ $(function () {
     var lyIndex = 0;
     //播放事件钩子，用于音乐播放时不停的改变时间
     player.audioTimeUpdate(function (currentTime, duration, timeStr) {
+      if(parseInt(currentTime) < 1) {
+        ySum = 0;
+      }
       //用户在滑动进度条时，这里就不该动进度条的长度了
       if (!progressMoving) {
         $time.text(timeStr);
@@ -305,8 +308,12 @@ $(function () {
   }
 
   function getMusicList() {
+    $.ajaxSetup({
+      url: '/musicPlayerDemo/'
+    })
+
     $.ajax({
-      url: '../source/musiclist.json',
+      url: 'source/musiclist.json',
       dataType: 'JSON',
       success: function (data) {
         player.musicList = data;
