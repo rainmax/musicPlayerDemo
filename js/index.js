@@ -168,9 +168,6 @@ $(function () {
     })
 
     $('.ft-prev').click(function () {
-      // 加载新歌的歌词
-      lyric.loadLyric($curListItem.get(0).music.link_lrc);
-
       var $prevListItem = $('.music-list .list-item').eq(curMusicIndex);
 
       if ($prevListItem.find('.menu-list-js-play').hasClass('menu-list-play')) {
@@ -179,7 +176,6 @@ $(function () {
         $prevListItem.toggleClass('list-item-light');
         $prevListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
         $prevListItem.find('.num').toggleClass('select');
-        $('.ft-pause').addClass('ft-play');
       }
 
       //播放音乐
@@ -193,25 +189,23 @@ $(function () {
       $curListItem.toggleClass('list-item-light');
       $curListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
       $curListItem.find('.num').toggleClass('select');
+      $('.ft-pause').addClass('ft-play');
 
       setMusicInfo($curListItem.get(0).music);
-
+      // 加载新歌的歌词
+      lyric.loadLyric($curListItem.get(0).music.link_lrc);
     
     })
 
     $('.ft-next').click(function () {
-
-      //加载新歌的歌词
-      lyric.loadLyric($curListItem.get(0).music.link_lrc);
-
+      if(player.prevIndex === -1) return;
       var $prevListItem = $('.music-list .list-item').eq(curMusicIndex);
 
       if ($prevListItem.find('.menu-list-js-play').hasClass('menu-list-play')) {
-        //给播放列表中正在播放的歌曲添加样式
+        //去掉上一首音乐的播放样式
         $prevListItem.toggleClass('list-item-light');
         $prevListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
         $prevListItem.find('.num').toggleClass('select');
-        $('.ft-pause').addClass('ft-play');
       }
 
       //播放音乐
@@ -225,9 +219,11 @@ $(function () {
       $curListItem.toggleClass('list-item-light');
       $curListItem.find('.menu-list-js-play').toggleClass('menu-list-play');
       $curListItem.find('.num').toggleClass('select');
+      $('.ft-pause').addClass('ft-play');
 
       setMusicInfo($curListItem.get(0).music);
-
+      //加载新歌的歌词
+      lyric.loadLyric($curListItem.get(0).music.link_lrc);
     })
 
 
