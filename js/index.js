@@ -306,10 +306,10 @@ $(function () {
 
   function getMusicList() {
     $.ajaxSetup({
-      url: '/musicPlayerDemo',
+      url: '/musicPlayerDemo/',
     });
     $.ajax({
-      url: '/source/musiclist.json',
+      url: '../source/musiclist.json',
       dataType: 'JSON',
       success: function (data) {
         player.musicList = data;
